@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Здесь будет простая игра "Угадай число" с элементами ООП и логики.
+# Также продемонстрируем использование декоратора и обработку исключений.
+
+import random
+import sys
+from functools import wraps
+
+def with_border(func):
+    """Декоратор, который выводит строку обрамления перед и после вывода функции."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print("================================")
+        result = func(*args, **kwargs)
+        print("================================")
+        return result
+    return wrapper
+
+class GuessNumberGame:
+    """Простая игра 'Угадай число'. 
+    Компьютер загадывает число, а игрок пытается угадать."""
+    def __init__(self, start=1, end=100):
+        self.start = start
+        self.end = end
+        self.secret = None
+        self.attempts = 0
+    
+    def start_game(self):
+        self.secret = random.randint(self.start, self.end)
+        self.attempts = 0
+        print(f"Я загадал число от {self.start} до {self.end}. Попробуйте угадать!")
+    
+    def guess(self, number):
+        self.attempts += 1
+        if number < self.secret:
+            print("Слишком мало!")
+        elif number > self.secret:
+            print("Слишком много!")
+        else:
+            print(f"Поздравляю! Вы угадали число {self.secret} за {self.attempts} попыток.")
+            return True
+        return False
+
+@with_border
+def print_instructions():
+    """Печатает инструкции к игре."""
+    print("Добро пожаловать в игру 'Угадай число'!")
+    print("Компьютер загадает число, а вы должны его угадать.")
+    print("Вводите числа, а программа будет говорить, больше или меньше.")
+    print("Для выхода введите 'exit' или 'выход'.")
+
+def main():
+    print_instructions()
+    game = GuessNumberGame(1, 50)
+    game.start_game()
+    while True:
+        user_input = input("Ваш вариант: ").strip().lower()
+        if user_input in ["exit", "выход"]:
+            print("Выход из игры.")
+            break
+        try:
+            guess_num = int(user_input)
+            if game.guess(guess_num):
+                # Если число угадано, начнем новую игру.
+                print("Давайте сыграем еще раз.")
+                game.start_game()
+        except ValueError:
+            print("Пожалуйста, введите целое число или 'exit' для выхода.")
+
+if __name__ == "__main__":
+
+    main()
